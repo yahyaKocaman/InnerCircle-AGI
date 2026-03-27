@@ -1,25 +1,62 @@
 # InnerCircle AGI
 
-> **"Tek bir AI değil. Senin adına düşünen, her alanda uzman bir konsey."**
+> **"Tek bir yapay zeka değil, senin adına düşünen ve her alanda uzman olan bir konsey."**
 
-InnerCircle AGI, kullanıcının hayatının gizli, profesyonel danışma kuruludur. Altı uzman ajan aynı anda çalışarak derin, veri odaklı ve sofistike öneriler sunar — ama asla karar vermez, dayatmaz.
+InnerCircle AGI, hayatınızın farklı alanlarına odaklanan, her biri kendi uzmanlığına sahip 6 ayrı yapay zeka ajanından oluşan kapalı ve özel bir "Danışma Kurulu"dur. Amacı, size sıradan chatbotlar gibi "şu kodu yaz, şu çeviriyi yap" demek yerine; hayatınızın gidişatı, yatırımlarınız, sağlığınız ve kariyeriniz hakkında **derin, veri odaklı ve proaktif (siz sormadan da düşünen)** akıl hocalığı yapmaktır.
 
----
-
-## Konsey Üyeleri
-
-| Ajan | Alan | Uzmanlık |
-|------|------|----------|
-| 🧭 Yaşam Koçu | Anlam & Büyüme | CBT, Stoa felsefesi, alışkanlık mimarisi |
-| 📈 Yatırım & Finans | Servet | Portföy teorisi, makroekonomi, risk analizi |
-| ⚡ Performans Koçu | Fiziksel | Periodizasyon, HRV, recovery bilimi |
-| 🚀 Kariyer Stratejisti | Profesyonel | Kariyer kapitali, müzakere, güç dinamikleri |
-| 🧬 Sağlık & Zihin Mimarı | Biyolojik | Longevity, hormonal optimizasyon, nörobilim |
-| 🔮 Sentezci | Sistemik | Çapraz alan bağlantıları, kaldıraç analizi |
+**Projenin temel felsefesi şudur:** Sistemin hiçbir üyesi sizin hayatınıza müdahale etmez veya size kararlar dayatmaz. Yalnızca beklenmedik bağlantılar kurar, size farklı ve ufuk açıcı bir perspektif sunar.
 
 ---
 
-## Mimari
+## 1. Konseyin Üyeleri Kimlerdir?
+
+İçeride, yazdığınız metni analiz edip en uygun olanın cevapladığı şu 6 uzman bulunur:
+
+| Ajan | Alan | Detaylı Uzmanlık |
+|------|------|------------------|
+| 🧭 **Yaşam Koçu** | Anlam & Büyüme | Sizin amaçlarınızı, anlam arayışınızı, motivasyonunuzu ve alışkanlıklarınızı inşa eder (CBT veya stoacı felsefe temellerini kullanır). |
+| 📈 **Yatırım & Finans** | Servet Gelişimi | Paranızı nasıl koruyacağınızı, makroekonomik gelişmeleri ve risk analizini masaya yatırır. |
+| ⚡ **Performans Koçu** | Fiziksel Durum | Uyku düzeniniz, fiziksel gücünüz ve antrenman biliminizle (recovery, HRV) ilgilenir. |
+| 🚀 **Kariyer Stratejisti** | Profesyonel Öz | Odak noktası maaşınız değil, "kariyer kapitaliniz" ve güç dinamikleridir. Nasıl daha değerli bir marka olacağınızı tartışır. |
+| 🧬 **Sağlık & Zihin Mimarı** | Biyolojik Zirve | Uzun yaşama (longevity), biyolojik saatiniz ve nörolojik potansiyelinize odaklanır. |
+| 🔮 **Sentezci** | Sistemik Pano | Ajanlar arası köprüdür. *"Kötü uykunuz (Sağlık), kariyer gerginliğinizi (Kariyer) nasıl etkiliyor?"* gibi büyük resmi okur. |
+
+---
+
+## 2. Arka Planda Nasıl Çalışır? (Teknik Altyapı)
+
+Bu sistem basit bir "ChatGPT kopyası" değildir. Katmanlı ve zekice tasarlanmış bir mimarisi vardır:
+
+- **Derin Düşünme (DeepSeek-R1):** Proje, arka planda (Ollama üzerinden) çalışan DeepSeek-R1 modelini kullanır. Bu modelin en büyük özelliği, size cevap vermeden önce kendi içinde bir *iç monolog (Chain-of-Thought)* üretmesi ve karmaşık problemleri önce kendi beyninde çözmesidir. Uygulamanızda bu düşünme aşaması "Analiz Ediliyor..." şeklinde şık bir animasyonla ekrana yansır.
+- **Orkestra Şefi (LangGraph):** Siz *"Borsada çok stres yapıyorum, uykularım kaçıyor"* dediğinizde, LangGraph sistemi bu cümleyi anlar ve hem Yatırım ajanına hem de Performans/Sağlık ajanına yönlendirerek ortak bir akıl üretir.
+- **Hafıza (ChromaDB):** Sizin daha önce yaptığınız tüm sohbetleri, koyduğunuz hedefleri kaydeder ve unutmaz. Ajanlarla konuştuğunuzda "Geçen ay spor hedefine odaklanmayı seçmiştik, nasıl gidiyor?" diyebilirler.
+- **Arka Plan Zekası (Celery):** Uygulamayı kapatsanız bile, Celery adı verilen arka plan işçileri sizin hafızanızı analiz etmeye devam eder ve günde 1-2 defa cebinize "Düşündürücü ve derin bir içgörü (Insight)" bırakır.
+
+---
+
+## 3. Proje Nerelerde Kullanılabilir?
+
+Bu proje, tamamen sizin lokal bilgisayarınızda (Docker ile) çalıştığı için verileriniz %100 gizlidir. Buluta veya OpenAI'a veri gitmez. Bu sayede bu sistemi:
+1. Kendi **kişisel asistanınız / yaşam koçunuz** olarak kullanabilir,
+2. Bunu bir **SaaS (Abonelikli Yazılım)** ürününe dönüştürüp, "Profesyonellere Özel AI Konseyi" adıyla internet üzerinden diğer insanlara satabilir,
+3. Veya kurumsal şirketlerin **Yönetim Kurulu Danışmanı** olarak pazarlayabilirsiniz.
+
+---
+
+## 👨‍💻 Proje Geliştiricileri
+
+*Bu proje, aşağıdaki ekip üyeleri tarafından tasarlanmış ve geliştirilmiştir:*
+
+- **Yahya Kocaman** — `B2180.060025`
+- **Onur Balcı** — `B2180.060043`
+- **Erdem Bakırcı** — `B2180.060051`
+- **Tolga Ertunç** — `B2280.060052`
+- **Baran Karabulut** — `B2280.060033`
+- **Mustafa Buğra Boz** — `B2180.060028`
+
+---
+
+## 🛠 Mimari & Teknoloji Yığını
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -47,8 +84,6 @@ InnerCircle AGI, kullanıcının hayatının gizli, profesyonel danışma kurulu
      └─────────────────┘
 ```
 
-### Teknoloji Stack
-
 | Katman | Teknoloji |
 |--------|-----------|
 | **Web Framework** | FastAPI + uvicorn |
@@ -64,7 +99,7 @@ InnerCircle AGI, kullanıcının hayatının gizli, profesyonel danışma kurulu
 
 ---
 
-## Hızlı Başlangıç
+## 🚀 Hızlı Başlangıç
 
 ### Ön Koşullar
 
@@ -94,126 +129,91 @@ make up
 # veya: docker compose up -d --build
 ```
 
-### 3. Kullan
+### 3. Uygulamayı Kullan
 
-| URL | Açıklama |
-|-----|---------|
-| http://localhost:8000 | Ana uygulama (SPA) |
-| http://localhost:8000/api/docs | OpenAPI dokümantasyonu |
-| http://localhost:8000/metrics | Prometheus metrikleri |
-| http://localhost:8000/health | Sağlık kontrolü |
+| Erişim | URL |
+|--------|---------|
+| **Ana uygulama (SPA)** | http://localhost:8000 |
+| **OpenAPI dokümantasyonu** | http://localhost:8000/api/docs |
+| **Prometheus metrikleri** | http://localhost:8000/metrics |
+| **Sağlık kontrolü** | http://localhost:8000/health |
 
 ---
 
-## Make Komutları
+## ⚙️ Yapılandırma (Make Komutları)
+
+Komut satırınızda projeyi kolayca yönetebilirsiniz:
 
 ```bash
 make up              # Tüm servisleri başlat
-make up-monitoring   # + Prometheus & Grafana
-make down            # Durdur
-make logs            # Logları takip et
-make logs-app        # Sadece API logları
-make shell           # Container içine gir
-make pull-model      # deepseek-r1:8b indir
-make test            # Testleri çalıştır
+make up-monitoring   # + Prometheus & Grafana ile başlat
+make down            # İmajları durdur
+make logs            # Tüm anlık logları takip et
+make logs-app        # Sadece API tarafındaki logları göster
+make pull-model      # deepseek-r1:8b LLM modelini indir
+make test            # Yazılım testlerini çalıştır
 make lint            # Kod kalite kontrolü
 ```
 
 ---
 
-## Monitoring (İsteğe Bağlı)
+## 📊 Monitoring (Gözlem & İstatistik)
+
+Projeyi detaylı grafiklerle takip etmek için:
 
 ```bash
 make up-monitoring
 ```
 
-| Servis | URL | Credentials |
+| Servis | URL | Kullanıcı Girişi |
 |--------|-----|-------------|
-| Prometheus | http://localhost:9090 | — |
-| Grafana | http://localhost:3000 | admin / innercircle |
+| **Prometheus** | http://localhost:9090 | *Yok* |
+| **Grafana** | http://localhost:3000 | `admin` / `innercircle` |
 
 ---
 
-## DeepSeek-R1 Chain-of-Thought UX
+## 🧠 DeepSeek-R1 Chain-of-Thought UX
 
-Bu projede DeepSeek-R1 modeli kullanılır. Model yanıt vermeden önce `<think>...</think>` blokları içinde iç monolog üretir.
+Bu projede DeepSeek-R1 modeli kullanılır. Model, sizinle iletişime geçmeden önce `<think>...</think>` blokları içinde adeta insan gibi akıl yürütür (iç monolog üretir).
 
-Frontend bu bloğu **"Analiz ediliyor…"** paneli olarak gösterir:
-- Panel otomatik açılır ve reasoning içeriğini gösterir
-- 2 saniye sonra otomatik collapse olur
-- Kullanıcı isterse manuel açabilir/kapatabilir
-- Ham `<think>` tagları hiçbir zaman kullanıcıya gösterilmez
-
----
-
-## API Referansı
-
-### Konsey'e Sor
-```bash
-POST /council/ask
-Authorization: Bearer <token>
-
-{
-  "message": "Kariyer geçişi hakkında ne düşünüyorsun?",
-  "agent_role": "career",    # null ise otomatik yönlendirme
-  "session_id": null         # null ise yeni oturum
-}
-```
-
-### Streaming (SSE)
-```bash
-POST /council/ask/stream
-# Server-Sent Events formatında token-by-token yanıt
-# Özel eventler: __THINKING_START__, __THINKING_END__
-```
+**Önyüz (Frontend) Entegrasyonu:**
+- Bu akıl yürütme düşünceleri ekranda **"Analiz ediliyor…"** adlı akordeon panel sayesinde görülür.
+- Panel, düşünme anında aşağıya kayarak otomatik açılır. Düşünce tamamlanınca asıl mesaja geçildiğinde şık bir şekilde otomatik kapanır.
+- Böylelikle karmaşık `<think>` tagları veya uzun sistem düşünceleri kullanıcıyı rahatsız etmez. 
 
 ---
 
-## Proje Yapısı
+## 📂 Proje Dizin Yapısı
 
 ```
 smart-task-ai/
 ├── app/
-│   ├── agents/           # 6 konsey ajanı + orchestrator
-│   │   ├── base_agent.py # DeepSeek-R1 CoT aware base
+│   ├── agents/           # 6 konsey ajanı ve yönlendirici (orchestrator)
+│   │   ├── base_agent.py # DeepSeek-R1 CoT aware taban sınıf
 │   │   ├── council.py    # LangGraph router
 │   │   ├── life_coach.py
 │   │   ├── investment.py
-│   │   ├── performance.py
-│   │   ├── career.py
-│   │   ├── health.py
-│   │   └── synthesizer.py
-│   ├── api/              # REST endpoints
-│   ├── core/             # Config, security, metrics
-│   ├── domain/           # SQLAlchemy models + Pydantic schemas
-│   ├── infrastructure/   # Ollama, ChromaDB, DB clients
-│   ├── static/           # Frontend SPA
-│   └── tasks/            # Celery background tasks
+│   │   └── ... 
+│   ├── api/              # RESTful API Endpoint'leri
+│   ├── core/             # Güvenlik, limitler ve konfigürasyonlar
+│   ├── domain/           # Veritabanı Modelleri ve Pydantic Şemaları
+│   ├── infrastructure/   # Ollama ve ChromaDB veritabanı sürücüleri
+│   ├── static/           # SPA Frontend dosyaları (JS, CSS, HTML)
+│   └── tasks/            # Celery arka plan işlem görevleri
 ├── monitoring/
 │   ├── prometheus.yml
-│   └── grafana/
-├── .github/workflows/    # CI (lint+test+build) + CD (GHCR push)
-├── Dockerfile            # Multi-stage, non-root
-├── docker-compose.yml    # + monitoring profile
-└── Makefile
+│   └── grafana/          # Grafana sistem panelleri(Dashboards)
+├── .github/workflows/    # CI (Lint+Test) ve CD (GHCR Push) Otomasyonu
+├── Dockerfile            # Multi-stage Docker yapısı
+└── docker-compose.yml    
 ```
 
 ---
 
-## CI/CD
+## 🔒 Güvenlik Altyapısı
 
-| Pipeline | Tetikleyici | Adımlar |
-|----------|-------------|---------|
-| `ci.yml` | PR + main push | lint → test → docker build |
-| `publish.yml` | main + tag (v*.*.*) | build → GHCR push (amd64+arm64) |
-
----
-
-## Güvenlik
-
-- JWT HS256 token authentication
-- bcrypt şifre hashing
-- Rate limiting (SlowAPI)
-- OWASP HTTP security headers
-- Non-root Docker user
-- SECRET_KEY environment variable (asla hardcode değil)
+- **JWT HS256** ile şifrelenmiş kimlik doğrulama.
+- **bcrypt** algoritmasıyla şifre kriptolama.
+- **SlowAPI** ile Rate limiting (DDoS ve spam koruması).
+- Tüm sayfalara uygulanan çok katmanlı **OWASP HTTP security headers**.
+- **Non-root Docker user** izolasyonu.
