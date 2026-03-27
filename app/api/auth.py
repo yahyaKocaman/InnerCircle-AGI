@@ -8,7 +8,7 @@ from app.core.security import hash_password, verify_password, create_access_toke
 from app.core.limiter import limiter
 from app.core.metrics import (
     AUTH_REGISTRATIONS, AUTH_LOGINS, AUTH_FAILURES,
-    ACTIVE_USERS_GAUGE, ACTIVE_SESSIONS_GAUGE
+    ACTIVE_USERS_GAUGE
 )
 
 router = APIRouter(tags=["Authentication"])

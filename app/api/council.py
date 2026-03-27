@@ -7,7 +7,6 @@ Supports both standard and streaming (SSE) responses.
 
 import json
 import logging
-from datetime import datetime, timezone
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import StreamingResponse
@@ -18,10 +17,10 @@ from app.domain.models import (
     User, UserProfile, ConversationSession, Message, AgentRole
 )
 from app.domain.schemas import (
-    CouncilQueryRequest, CouncilQueryResponse, AgentInfo,
+    CouncilQueryRequest, CouncilQueryResponse,
     SessionResponse, SessionDetailResponse, MessageResponse
 )
-from app.agents.council import council, AGENT_REGISTRY, AGENT_METADATA
+from app.agents.council import council
 from app.core.metrics import (
     COUNCIL_QUERIES_TOTAL, AGENT_QUERY_COUNTER, OLLAMA_LATENCY
 )
@@ -36,14 +35,22 @@ def _build_profile_context(profile: Optional[UserProfile]) -> str:
     if not profile:
         return ""
     parts = []
-    if profile.age:          parts.append(f"Yaş: {profile.age}")
-    if profile.occupation:   parts.append(f"Meslek: {profile.occupation}")
-    if profile.career_stage: parts.append(f"Kariyer aşaması: {profile.career_stage}")
-    if profile.risk_tolerance: parts.append(f"Risk toleransı: {profile.risk_tolerance}")
-    if profile.goals:        parts.append(f"Hedefler: {', '.join(profile.goals)}")
-    if profile.interests:    parts.append(f"İlgi alanları: {', '.join(profile.interests)}")
-    if profile.health_focus: parts.append(f"Sağlık odağı: {profile.health_focus}")
-    if profile.financial_context: parts.append(f"Finansal durum: {profile.financial_context}")
+    if profile.age:
+        parts.append(f"Yaş: {profile.age}")
+    if profile.occupation:
+        parts.append(f"Meslek: {profile.occupation}")
+    if profile.career_stage:
+        parts.append(f"Kariyer aşaması: {profile.career_stage}")
+    if profile.risk_tolerance:
+        parts.append(f"Risk toleransı: {profile.risk_tolerance}")
+    if profile.goals:
+        parts.append(f"Hedefler: {', '.join(profile.goals)}")
+    if profile.interests:
+        parts.append(f"İlgi alanları: {', '.join(profile.interests)}")
+    if profile.health_focus:
+        parts.append(f"Sağlık odağı: {profile.health_focus}")
+    if profile.financial_context:
+        parts.append(f"Finansal durum: {profile.financial_context}")
     return "\n".join(parts)
 
 
@@ -225,7 +232,6 @@ async def ask_council_stream(
 
     async def event_generator():
         full_response = ""
-        resolved_role = None
 
         # Send metadata event first
         meta = {

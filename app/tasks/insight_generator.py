@@ -47,10 +47,14 @@ def _build_profile_context(profile: UserProfile | None) -> str:
     if not profile:
         return ""
     parts = []
-    if profile.age:          parts.append(f"Yaş: {profile.age}")
-    if profile.occupation:   parts.append(f"Meslek: {profile.occupation}")
-    if profile.goals:        parts.append(f"Hedefler: {', '.join(profile.goals)}")
-    if profile.career_stage: parts.append(f"Kariyer: {profile.career_stage}")
+    if profile.age:
+        parts.append(f"Yaş: {profile.age}")
+    if profile.occupation:
+        parts.append(f"Meslek: {profile.occupation}")
+    if profile.goals:
+        parts.append(f"Hedefler: {', '.join(profile.goals)}")
+    if profile.career_stage:
+        parts.append(f"Kariyer: {profile.career_stage}")
     return "\n".join(parts)
 
 

@@ -17,7 +17,7 @@ Flow:
 """
 
 import logging
-from typing import Optional, TypedDict, Annotated, AsyncIterator
+from typing import Optional, TypedDict, AsyncIterator
 from langgraph.graph import StateGraph, END
 
 from app.domain.models import AgentRole
