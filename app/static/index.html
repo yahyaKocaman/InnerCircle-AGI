@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InnerCircle AGI — Gizli Danışma Konseyiniz</title>
+  <meta name="description" content="InnerCircle AGI: Tek bir AI değil. Senin adına düşünen, her alanda uzman bir konsey." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- ════════════ AUTH SCREEN ════════════ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-bg">
+    <div class="auth-orb orb-1"></div>
+    <div class="auth-orb orb-2"></div>
+    <div class="auth-orb orb-3"></div>
+    <div class="auth-grid"></div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-emblem">
+        <span class="emblem-icon">◈</span>
+      </div>
+      <h1 class="auth-title">InnerCircle <span class="gold">AGI</span></h1>
+      <p class="auth-slogan">Tek bir AI değil. Senin adına düşünen,<br>her alanda uzman bir konsey.</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button id="tab-login"    class="auth-tab active" onclick="switchTab('login')">Giriş</button>
+      <button id="tab-register" class="auth-tab"        onclick="switchTab('register')">Kayıt</button>
+    </div>
+
+    <!-- Login -->
+    <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+      <div class="field-group">
+        <label>Kullanıcı Adı</label>
+        <input id="login-username" type="text" placeholder="kullanici_adi" required autocomplete="username" />
+      </div>
+      <div class="field-group">
+        <label>Şifre</label>
+        <input id="login-password" type="password" placeholder="••••••••" required autocomplete="current-password" />
+      </div>
+      <div id="login-error" class="auth-error hidden"></div>
+      <button type="submit" class="btn-primary full" id="login-btn">
+        <span class="btn-text">Konseye Giriş</span>
+        <span class="btn-spinner hidden">⟳</span>
+      </button>
+    </form>
+
+    <!-- Register -->
+    <form id="register-form" class="auth-form hidden" onsubmit="handleRegister(event)">
+      <div class="field-group">
+        <label>Ad Soyad</label>
+        <input id="reg-fullname" type="text" placeholder="Adınız Soyadınız" />
+      </div>
+      <div class="field-group">
+        <label>Kullanıcı Adı</label>
+        <input id="reg-username" type="text" placeholder="kullanici_adi" required autocomplete="username" />
+      </div>
+      <div class="field-group">
+        <label>E-posta</label>
+        <input id="reg-email" type="email" placeholder="ornek@email.com" required />
+      </div>
+      <div class="field-group">
+        <label>Şifre</label>
+        <input id="reg-password" type="password" placeholder="En az 6 karakter" required autocomplete="new-password" />
+      </div>
+      <div id="reg-error" class="auth-error hidden"></div>
+      <button type="submit" class="btn-primary full" id="reg-btn">
+        <span class="btn-text">Konseye Katıl</span>
+        <span class="btn-spinner hidden">⟳</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ════════════ APP SCREEN ════════════ -->
+<div id="app-screen" class="app-screen hidden">
+
+  <!-- ── Left Sidebar: Council Members ── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="sidebar-emblem">◈</span>
+        <div class="sidebar-brand-text">
+          <span class="brand-name">InnerCircle</span>
+          <span class="brand-tag">AGI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Konsey Üyeleri</div>
+    <nav class="agent-nav" id="agent-nav">
+      <!-- Filled by JS -->
+    </nav>
+
+    <div class="sidebar-section-label">Geçmiş Oturumlar</div>
+    <div class="session-list" id="session-list">
+      <!-- Filled by JS -->
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-chip" id="user-chip">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <span id="sidebar-username">—</span>
+      </div>
+      <button class="btn-icon-ghost" onclick="logout()" title="Çıkış">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main Chat Area ── -->
+  <main class="chat-area">
+
+    <!-- Chat Header -->
+    <header class="chat-header" id="chat-header">
+      <div class="agent-identity" id="agent-identity">
+        <div class="agent-icon-lg" id="header-agent-icon">🔮</div>
+        <div>
+          <h2 id="header-agent-name">Konsey</h2>
+          <p id="header-agent-desc" class="agent-desc">Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın</p>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="btn-ghost-sm" onclick="newSession()" title="Yeni oturum" id="btn-new-session">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Yeni Oturum
+        </button>
+      </div>
+    </header>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messages-area">
+      <!-- Welcome state -->
+      <div class="welcome-state" id="welcome-state">
+        <div class="welcome-emblem">◈</div>
+        <h2 class="welcome-title">Konseyin sizi bekliyor.</h2>
+        <p class="welcome-sub">Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın.<br>Konsey, sorunuzu otomatik olarak ilgili uzmana yönlendirir.</p>
+        <div class="agent-quick-grid" id="agent-quick-grid">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="input-agent-badge" id="input-agent-badge">
+        <span id="badge-icon">🔮</span>
+        <span id="badge-name">Otomatik</span>
+        <button class="badge-clear" onclick="clearAgentFilter()" id="badge-clear">✕</button>
+      </div>
+      <div class="chat-input-wrapper">
+        <textarea
+          id="chat-input"
+          class="chat-input"
+          placeholder="Konseye sorunuzu yazın…"
+          rows="1"
+          onkeydown="handleInputKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="btn-send" id="btn-send" onclick="sendMessage()" title="Gönder">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Konsey yanıtları bilgi amaçlıdır. Tüm kararlar size aittir.</div>
+    </div>
+  </main>
+
+  <!-- ── Right Panel: Insights ── -->
+  <aside class="right-panel" id="right-panel">
+    <div class="panel-header">
+      <h3>Proaktif İçgörüler</h3>
+      <div class="insight-badge" id="insight-count-badge">0</div>
+    </div>
+    <div class="insight-feed" id="insight-feed">
+      <div class="insight-empty">
+        <span>🔮</span>
+        <p>Konsey içgörüleri burada görünür.<br>Konsey sizi düzenli olarak dinler.</p>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h3>Profil</h3>
+      <div id="profile-summary" class="profile-summary">
+        <button class="btn-outline-sm" onclick="openProfileModal()">Profili Düzenle</button>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ════════════ PROFILE MODAL ════════════ -->
+<div id="profile-modal" class="modal-overlay hidden" onclick="closeProfileOutside(event)">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Profil — Konsey Bağlamı</h3>
+      <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <form id="profile-form" onsubmit="handleSaveProfile(event)">
+      <div class="modal-body">
+        <div class="profile-note">
+          Bu bilgiler yalnızca konsey ajanlarının sizi daha iyi anlaması için kullanılır. Karar her zaman sizindir.
+        </div>
+        <div class="modal-row">
+          <div class="field-group">
+            <label>Yaş</label>
+            <input id="pf-age" type="number" placeholder="35" min="16" max="100" />
+          </div>
+          <div class="field-group">
+            <label>Meslek</label>
+            <input id="pf-occupation" type="text" placeholder="Mühendis, Girişimci..." />
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="field-group">
+            <label>Kariyer Aşaması</label>
+            <select id="pf-career-stage" class="select-field">
+              <option value="">Seçin</option>
+              <option value="junior">Junior</option>
+              <option value="mid">Mid-level</option>
+              <option value="senior">Senior</option>
+              <option value="executive">Executive</option>
+              <option value="founder">Kurucu</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Risk Toleransı</label>
+            <select id="pf-risk" class="select-field">
+              <option value="">Seçin</option>
+              <option value="low">Düşük</option>
+              <option value="medium">Orta</option>
+              <option value="high">Yüksek</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Hedefler (virgülle ayırın)</label>
+          <input id="pf-goals" type="text" placeholder="Finansal özgürlük, sağlıklı yaşam, kariyer geçişi" />
+        </div>
+        <div class="field-group">
+          <label>İlgi Alanları</label>
+          <input id="pf-interests" type="text" placeholder="Teknoloji, yatırım, spor bilimi" />
+        </div>
+        <div class="field-group">
+          <label>Sağlık Odağı</label>
+          <input id="pf-health" type="text" placeholder="Enerji optimizasyonu, stres yönetimi..." />
+        </div>
+        <div class="field-group">
+          <label>Finansal Bağlam</label>
+          <input id="pf-financial" type="text" placeholder="Birikim aşamasında, yatırım portföyü oluşturuyorum..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" onclick="closeProfileModal()">İptal</button>
+        <button type="submit" class="btn-primary" id="save-profile-btn">
+          <span class="btn-text">Kaydet</span>
+          <span class="btn-spinner hidden">⟳</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ════════════ TOAST ════════════ -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

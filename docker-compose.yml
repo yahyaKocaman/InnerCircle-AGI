@@ -1,29 +1,168 @@
 version: "3.9"
 
+# ── InnerCircle AGI — Docker Compose ─────────────────────────
+# Services (default):
+#   app           FastAPI application
+#   db            PostgreSQL 16
+#   redis         Redis 7 (Celery broker + result backend)
+#   celery_worker Celery worker (insight generation)
+#   celery_beat   Celery beat scheduler (periodic tasks)
+#
+# Monitoring profile (optional):
+#   prometheus    Metrics collection  → http://localhost:9090
+#   grafana       Dashboards          → http://localhost:3000
+#
+# Usage:
+#   Default:              docker compose up -d
+#   With monitoring:      docker compose --profile monitoring up -d
+#
+# NOTE: Ollama runs locally on your host machine.
+#       Run these commands before starting:
+#         ollama pull deepseek-r1:8b
+#         ollama serve
+#
+# Host is accessible from containers via: host.docker.internal
+
+x-common-env: &common-env
+  DATABASE_URL: postgresql://postgres:postgres@db:5432/innercircle
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/0
+  CELERY_RESULT_BACKEND: redis://redis:6379/1
+  OLLAMA_BASE_URL: http://host.docker.internal:11434
+  OLLAMA_MODEL: deepseek-r1:8b
+  CHROMA_PERSIST_DIR: /app/chroma_data
+
+x-common-extra-hosts: &common-extra-hosts
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
 services:
+
+  app:
+    build: .
+    container_name: innercircle-api
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *common-env
+      APP_NAME: InnerCircle AGI
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production-32chars!!}
+      DEBUG: "false"
+    volumes:
+      - chroma_data:/app/chroma_data
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    <<: *common-extra-hosts
+
   db:
-    image: postgres:15
-    restart: always
+    image: postgres:16-alpine
+    container_name: innercircle-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: tasks
+      POSTGRES_DB: innercircle
+    volumes:
+      - pg_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  api:
-    build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
-    volumes:
-      - .:/app
+  redis:
+    image: redis:7-alpine
+    container_name: innercircle-redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
-      - "8000:8000"
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  celery_worker:
+    build: .
+    container_name: innercircle-celery-worker
+    command: celery -A app.core.celery_app.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      <<: *common-env
+    volumes:
+      - chroma_data:/app/chroma_data
     depends_on:
-      - db
-    env_file:
-      - .env
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    <<: *common-extra-hosts
+
+  celery_beat:
+    build: .
+    container_name: innercircle-celery-beat
+    command: celery -A app.core.celery_app.celery_app beat --loglevel=info
+    environment:
+      <<: *common-env
+    volumes:
+      - chroma_data:/app/chroma_data
+    depends_on:
+      - redis
+    restart: unless-stopped
+    <<: *common-extra-hosts
+
+  # ── Monitoring (optional profile) ─────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: innercircle-prometheus
+    profiles: ["monitoring"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: innercircle-grafana
+    profiles: ["monitoring"]
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-innercircle}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_DOMAIN: localhost
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
+  pg_data:
+  chroma_data:
+  prometheus_data:
+  grafana_data:

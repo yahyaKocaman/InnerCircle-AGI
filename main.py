@@ -1,23 +1,155 @@
-from fastapi import FastAPI
-from app.infrastructure.database import Base, engine
-from app.api import auth, tasks
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 from prometheus_fastapi_instrumentator import Instrumentator
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from app.core.config import settings
 from app.core.logging import setup_logging
+from app.core.limiter import limiter
+from app.core.middleware import SecurityHeadersMiddleware, RequestLoggingMiddleware
+from app.infrastructure.database import Base, engine
+from app.infrastructure.chroma_client import get_chroma_client
+from app.infrastructure.ollama_client import ollama
+from app.api import auth
+from app.api import council, insights, profile
+from app.api.deps import get_db
+import os
 
-app = FastAPI(title="Smart Task AI Microservice")
-
-# Logging setup
 setup_logging()
 
-@app.on_event("startup")
-def on_startup():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan: initialise DB tables and ChromaDB on startup."""
+    # SQL tables
     Base.metadata.create_all(bind=engine)
+    # ChromaDB — create collections for all agents
+    get_chroma_client()
+    # Log Ollama status
+    import logging
+    logger = logging.getLogger(__name__)
+    ollama_status = await ollama.health_check()
+    logger.info(f"Ollama status: {ollama_status['status']} | model={ollama_status.get('configured_model')}")
+    yield
 
-app.include_router(auth.router, prefix="/auth")
-app.include_router(tasks.router, prefix="/tasks")
 
-Instrumentator().instrument(app).expose(app)
+# ── FastAPI Application ───────────────────────────────────────
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="""
+## InnerCircle AGI — Your Private Advisory Council
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+Not a single AI. A council of 6 specialist agents thinking on your behalf.
+
+| Concept | Implementation |
+|---------|---------------|
+| **Clean Architecture** | domain / infrastructure / agents / api / core layers |
+| **REST API** | FastAPI, OpenAPI 3.1, versioned endpoints, SSE streaming |
+| **Containerization** | Docker + Docker Compose (app, db, redis, celery) |
+| **CI/CD** | GitHub Actions: lint → test → build → publish |
+| **Observability** | Prometheus metrics, structured logging, Ollama latency histogram |
+| **Security** | JWT (HS256), bcrypt, rate limiting, OWASP security headers |
+| **AI Integration** | LangGraph multi-agent swarm + Ollama (qwen2.5:7b) + ChromaDB memory |
+
+### Council Members
+| Agent | Expertise |
+|-------|-----------|
+| 🧭 Yaşam Koçu | Değer tasarımı, CBT, alışkanlık mimarisi |
+| 📈 Yatırım & Finans | Portföy teorisi, makroekonomik analiz |
+| ⚡ Performans Koçu | Periodizasyon, HRV, recovery bilimi |
+| 🚀 Kariyer Stratejisti | Kariyer kapitali, personal brand, müzakere |
+| 🧬 Sağlık Mimarı | Longevity, hormonal optimizasyon, nörobilim |
+| 🔮 Sentezci | Bütünsel sentez, çapraz etki analizi |
+
+**API Docs:** `/api/docs` • **Metrics:** `/metrics` • **Health:** `/health`
+    """,
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+)
+
+# ── Security: Rate Limiter ────────────────────────────────────
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# ── Security: CORS ────────────────────────────────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Security: HTTP Security Headers ──────────────────────────
+app.add_middleware(SecurityHeadersMiddleware)
+
+# ── Observability: Request Logging ───────────────────────────
+app.add_middleware(RequestLoggingMiddleware)
+
+# ── API Routes ────────────────────────────────────────────────
+app.include_router(auth.router,     prefix="/auth")
+app.include_router(council.router,  prefix="/council")
+app.include_router(insights.router, prefix="/insights")
+app.include_router(profile.router,  prefix="/profile")
+
+# ── Observability: Prometheus Metrics ────────────────────────
+Instrumentator(
+    should_group_status_codes=True,
+    should_ignore_untemplated=True,
+    should_respect_env_var=True,
+    should_instrument_requests_inprogress=True,
+).instrument(app).expose(app)
+
+# ── Static files + Frontend SPA ──────────────────────────────
+static_dir = os.path.join(os.path.dirname(__file__), "app", "static")
+if os.path.isdir(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+    @app.get("/", include_in_schema=False)
+    def serve_frontend():
+        return FileResponse(os.path.join(static_dir, "index.html"))
+
+
+# ── System Endpoints ─────────────────────────────────────────
+@app.get("/health", tags=["System"], summary="Health check")
+async def health(db: Session = Depends(get_db)):
+    """
+    Detailed health check for load balancers and monitoring.
+    Checks: API, database, Ollama LLM connectivity.
+    """
+    db_status = "ok"
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception:
+        db_status = "error"
+
+    ollama_info = await ollama.health_check()
+    ollama_status = ollama_info.get("status", "unknown")
+
+    overall = "ok" if db_status == "ok" else "degraded"
+    if ollama_status != "ok":
+        overall = "degraded"
+
+    return {
+        "status":    overall,
+        "app":       settings.APP_NAME,
+        "version":   settings.APP_VERSION,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "components": {
+            "api":            "ok",
+            "database":       db_status,
+            "ollama":         ollama_status,
+            "ollama_model":   settings.OLLAMA_MODEL,
+            "model_available": ollama_info.get("model_available", False),
+        },
+    }
