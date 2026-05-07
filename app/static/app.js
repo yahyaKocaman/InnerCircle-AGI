@@ -108,6 +108,8 @@ async function initApp() {
   await loadSessions();
   await loadInsights();
   await loadProfile();
+  
+  startDashboardPolling();
 }
 
 /* ══════════════════════════════════════════════
@@ -953,3 +955,104 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (token) await loadInsights();
   }, 60000);
 });
+
+/* ══════════════════════════════════════════════
+   DASHBOARD METRICS (Real-time updates)
+   ══════════════════════════════════════════════ */
+let dashboardPollInterval = null;
+
+function startDashboardPolling() {
+  if(dashboardPollInterval) clearInterval(dashboardPollInterval);
+  fetchDashboardMetrics(); // fetch immediately
+  dashboardPollInterval = setInterval(fetchDashboardMetrics, 10000); // every 10 seconds
+}
+
+async function fetchDashboardMetrics() {
+  if(!token) return;
+  try {
+    const res = await apiFetch('/dashboard/metrics');
+    if(!res.ok) return;
+    const data = await res.json();
+    
+    // 1. System Status
+    if(data.system) {
+      const cpuVal = document.getElementById('sys-cpu-val');
+      if (cpuVal) cpuVal.textContent = `${data.system.cpu.toFixed(1)}%`;
+      const cpuFill = document.getElementById('sys-cpu-fill');
+      if (cpuFill) cpuFill.style.width = `${data.system.cpu}%`;
+      
+      const memVal = document.getElementById('sys-mem-val');
+      if (memVal) memVal.textContent = `${data.system.mem.toFixed(1)}%`;
+      const memFill = document.getElementById('sys-mem-fill');
+      if (memFill) memFill.style.width = `${data.system.mem}%`;
+      
+      const netVal = document.getElementById('sys-net-val');
+      if (netVal) netVal.textContent = `${data.system.net}%`;
+      const netFill = document.getElementById('sys-net-fill');
+      if (netFill) netFill.style.width = `${data.system.net}%`;
+    }
+    
+    // 2. Active Agents
+    if(data.active_agents && data.active_agents.length > 0) {
+      const activeAgentsList = document.getElementById('active-agents-list');
+      if(activeAgentsList) {
+        activeAgentsList.innerHTML = data.active_agents.map(a => {
+          const color = a.status === 'Running' ? '#3b82f6' : (a.status === 'Training' ? '#ec4899' : '#f59e0b');
+          return `
+            <div class="aa-item" onclick="openAgentChat('${a.role}')">
+              <div class="aa-icon" style="background: ${color}20; color: ${color};"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+              <div class="aa-info"><h4>${a.name}</h4><span>${a.status}</span></div>
+              <div class="aa-graph"><svg viewBox="0 0 50 20" stroke="${color}" fill="none" stroke-width="2"><polyline points="0,10 10,15 20,5 30,12 40,8 50,10"></polyline></svg></div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+    
+    // 3. Recent Tasks
+    if(data.recent_tasks) {
+      const recentTasksList = document.getElementById('recent-tasks-list');
+      if(recentTasksList) {
+        recentTasksList.innerHTML = data.recent_tasks.length === 0 ? '<div style="color:var(--dash-muted);font-size:0.85rem">Henüz görev yok.</div>' : data.recent_tasks.map(t => {
+          const statusClass = t.status === 'Completed' ? 'status-done' : 'status-progress';
+          return `
+            <div class="task-item">
+              <div class="task-info">${t.title}</div>
+              <div class="task-status ${statusClass}">${t.status}</div>
+              <div class="task-val">${t.progress}%</div>
+            </div>
+            <div class="task-bar-bg"><div class="task-bar-fill" style="width: ${t.progress}%"></div></div>
+          `;
+        }).join('');
+      }
+    }
+    
+    // 4. Activity Stream
+    if(data.activity_stream) {
+      const activityStreamList = document.getElementById('activity-stream-list');
+      if(activityStreamList) {
+        activityStreamList.innerHTML = data.activity_stream.length === 0 ? '<div style="color:var(--dash-muted);font-size:0.85rem">Aktivite bulunamadı.</div>' : data.activity_stream.map(act => {
+          return `
+            <div class="act-item">
+              <div class="act-icon" style="color:var(--dash-neon)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+              <div class="act-info">
+                <strong>${act.text}</strong>
+                <p>${act.subtext}</p>
+              </div>
+              <div class="act-time">${act.time_ago}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+    
+    // 5. Network Status
+    if(data.network) {
+      const netCount = document.getElementById('network-members-count');
+      if(netCount) netCount.textContent = data.network.members_online;
+    }
+    
+  } catch(e) {
+    console.error('Failed to fetch dashboard metrics:', e);
+  }
+}

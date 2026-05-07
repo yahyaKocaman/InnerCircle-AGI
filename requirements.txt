@@ -17,8 +17,9 @@ pydantic>=2.0
 pydantic-settings
 python-dotenv
 
-# ── Observability ───────────────────────────────────────────
+# ── Observability & Monitoring ──────────────────────────────
 prometheus-fastapi-instrumentator
+psutil>=5.9.0
 
 # ── Rate Limiting ────────────────────────────────────────────
 slowapi

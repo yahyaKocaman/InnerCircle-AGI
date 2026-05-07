@@ -124,9 +124,9 @@
 
     <div class="sys-status">
       <div class="sys-header">System Status <span class="status-dot"></span><span class="status-text">Optimal</span></div>
-      <div class="sys-bar"><div class="sys-label">CPU</div><div class="bar-bg"><div class="bar-fill" style="width: 23%"></div></div><div class="sys-val">23%</div></div>
-      <div class="sys-bar"><div class="sys-label">MEM</div><div class="bar-bg"><div class="bar-fill" style="width: 41%"></div></div><div class="sys-val">41%</div></div>
-      <div class="sys-bar"><div class="sys-label">NET</div><div class="bar-bg"><div class="bar-fill" style="width: 18%"></div></div><div class="sys-val">18%</div></div>
+      <div class="sys-bar"><div class="sys-label">CPU</div><div class="bar-bg"><div id="sys-cpu-fill" class="bar-fill" style="width: 23%"></div></div><div id="sys-cpu-val" class="sys-val">23%</div></div>
+      <div class="sys-bar"><div class="sys-label">MEM</div><div class="bar-bg"><div id="sys-mem-fill" class="bar-fill" style="width: 41%"></div></div><div id="sys-mem-val" class="sys-val">41%</div></div>
+      <div class="sys-bar"><div class="sys-label">NET</div><div class="bar-bg"><div id="sys-net-fill" class="bar-fill" style="width: 18%"></div></div><div id="sys-net-val" class="sys-val">18%</div></div>
     </div>
 
     <div class="dash-profile" onclick="logout()">
@@ -216,7 +216,7 @@
             <h3>Active Agents</h3>
             <a href="#" class="view-all" onclick="openComingSoon('Tüm Ajanlar')">View All</a>
           </div>
-          <div class="agent-list">
+          <div id="active-agents-list" class="agent-list">
             <div class="aa-item" onclick="openAgentChat('research')">
               <div class="aa-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
               <div class="aa-info"><h4>Research Agent</h4><span>Running</span></div>
@@ -250,7 +250,7 @@
             <h3>Recent Tasks</h3>
             <a href="#" class="view-all" onclick="openComingSoon('Tüm Görevler')">View All</a>
           </div>
-          <div class="task-list">
+          <div id="recent-tasks-list" class="task-list">
             <div class="task-item">
               <div class="task-info">Build adaptive memory system</div>
               <div class="task-status status-progress">In Progress</div>
@@ -287,7 +287,7 @@
             <h3>Activity Stream</h3>
             <a href="#" class="view-all" onclick="openComingSoon('Tüm Aktiviteler')">View All</a>
           </div>
-          <div class="activity-list">
+          <div id="activity-stream-list" class="activity-list">
             <div class="act-item">
               <div class="act-icon success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
               <div class="act-info">
@@ -336,7 +336,7 @@
             <div class="net-node n4"></div><div class="net-node n5"></div>
           </div>
           <div class="network-footer">
-            <span class="net-status"><span class="dot"></span>24 Members Online</span>
+            <span class="net-status"><span class="dot"></span><span id="network-members-count">24</span> Members Online</span>
             <button class="btn-outline-sm" onclick="openComingSoon('Ağa Katıl')">Go to Inner Circle</button>
           </div>
         </div>

@@ -18,7 +18,7 @@ from app.infrastructure.database import Base, engine
 from app.infrastructure.chroma_client import get_chroma_client
 from app.infrastructure.openai_client import llm
 from app.api import auth
-from app.api import council, insights, profile
+from app.api import council, insights, profile, dashboard
 from app.api.deps import get_db
 import os
 
@@ -46,31 +46,7 @@ app = FastAPI(
     version=settings.APP_VERSION,
     description="""
 ## InnerCircle AGI — Your Private Advisory Council
-
-Not a single AI. A council of 6 specialist agents thinking on your behalf.
-
-| Concept | Implementation |
-|---------|---------------|
-| **Clean Architecture** | domain / infrastructure / agents / api / core layers |
-| **REST API** | FastAPI, OpenAPI 3.1, versioned endpoints, SSE streaming |
-| **Containerization** | Docker + Docker Compose (app, db, redis, celery) |
-| **CI/CD** | GitHub Actions: lint → test → build → publish |
-| **Observability** | Prometheus metrics, structured logging, LLM latency histogram |
-| **Security** | JWT (HS256), bcrypt, rate limiting, OWASP security headers |
-| **AI Integration** | LangGraph multi-agent swarm + OpenAI GPT-4o-mini + ChromaDB memory |
-
-### Council Members
-| Agent | Expertise |
-|-------|-----------|
-| 🧭 Yaşam Koçu | Değer tasarımı, CBT, alışkanlık mimarisi |
-| 📈 Yatırım & Finans | Portföy teorisi, makroekonomik analiz |
-| ⚡ Performans Koçu | Periodizasyon, HRV, recovery bilimi |
-| 🚀 Kariyer Stratejisti | Kariyer kapitali, personal brand, müzakere |
-| 🧬 Sağlık Mimarı | Longevity, hormonal optimizasyon, nörobilim |
-| 🔮 Sentezci | Bütünsel sentez, çapraz etki analizi |
-
-**API Docs:** `/api/docs` • **Metrics:** `/metrics` • **Health:** `/health`
-    """,
+""",
     lifespan=lifespan,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
@@ -101,6 +77,7 @@ app.include_router(auth.router,     prefix="/auth")
 app.include_router(council.router,  prefix="/council")
 app.include_router(insights.router, prefix="/insights")
 app.include_router(profile.router,  prefix="/profile")
+app.include_router(dashboard.router, prefix="/dashboard")
 
 # ── Observability: Prometheus Metrics ────────────────────────
 Instrumentator(
