@@ -111,6 +111,48 @@ async function initApp() {
 }
 
 /* ══════════════════════════════════════════════
+   VIEW SWITCHING (Dashboard vs Chat)
+   ══════════════════════════════════════════════ */
+function switchView(viewName) {
+  const dashView = document.getElementById('dashboard-view');
+  const chatView = document.getElementById('chat-view');
+  const navItems = document.querySelectorAll('.dash-nav .nav-item');
+  
+  if(!dashView || !chatView) return;
+
+  navItems.forEach(item => item.classList.remove('active'));
+
+  if (viewName === 'dashboard') {
+    dashView.classList.remove('view-hidden');
+    dashView.classList.add('view-active');
+    chatView.classList.remove('view-active');
+    chatView.classList.add('view-hidden');
+    navItems[0].classList.add('active');
+  } else if (viewName === 'chat') {
+    dashView.classList.remove('view-active');
+    dashView.classList.add('view-hidden');
+    chatView.classList.remove('view-hidden');
+    chatView.classList.add('view-active');
+    navItems[1].classList.add('active');
+  }
+}
+
+function openAgentChat(agentType) {
+  switchView('chat');
+  
+  // Map dashboard concepts to backend roles
+  const roleMap = {
+    'research': 'career',
+    'code': 'performance',
+    'learning': 'synthesizer',
+    'security': 'investment'
+  };
+  
+  const mappedRole = roleMap[agentType] || 'synthesizer';
+  selectAgent(mappedRole);
+}
+
+/* ══════════════════════════════════════════════
    AGENTS
    ══════════════════════════════════════════════ */
 async function loadAgents() {

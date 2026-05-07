@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/dashboard.css" />
 </head>
 <body>
 
@@ -87,123 +88,330 @@
 <!-- ════════════ APP SCREEN ════════════ -->
 <div id="app-screen" class="app-screen hidden">
   
-  <!-- Cyber Background Layer -->
-  <div class="cyber-bg-layer">
-    <div class="auth-grid"></div>
-    <div class="cyber-orb" id="global-cyber-orb"></div>
-  </div>
-
-  <!-- ── Left Sidebar: Council Members ── -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <span class="sidebar-emblem">◈</span>
-        <div class="sidebar-brand-text">
-          <span class="brand-name">InnerCircle</span>
-          <span class="brand-tag">AGI</span>
-        </div>
+  <!-- ── Left Sidebar (Dashboard) ── -->
+  <aside class="dash-sidebar">
+    <div class="dash-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--dash-neon)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path>
+      </svg>
+      <div class="logo-text">
+        <span class="logo-title">InnerCircle</span>
+        <span class="logo-tag">AGI</span>
       </div>
     </div>
 
-    <div class="sidebar-section-label">Konsey Üyeleri</div>
-    <nav class="agent-nav" id="agent-nav">
-      <!-- Filled by JS -->
+    <nav class="dash-nav">
+      <a href="#" class="nav-item active" onclick="switchView('dashboard')"><span class="icon">⊞</span> Dashboard</a>
+      <a href="#" class="nav-item" onclick="switchView('chat')"><span class="icon">🧠</span> Mind Core</a>
+      <a href="#" class="nav-item" onclick="switchView('chat')"><span class="icon">🤖</span> Agents</a>
+      <a href="#" class="nav-item"><span class="icon">💾</span> Memory</a>
+      <a href="#" class="nav-item"><span class="icon">📚</span> Knowledge</a>
+      <a href="#" class="nav-item"><span class="icon">🛠</span> Tools</a>
+      <a href="#" class="nav-item"><span class="icon">📋</span> Tasks</a>
+      <a href="#" class="nav-item"><span class="icon">🌐</span> Inner Circle</a>
+      <a href="#" class="nav-item"><span class="icon">⚖️</span> Governance</a>
+      <a href="#" class="nav-item"><span class="icon">⚙️</span> Settings</a>
     </nav>
 
-    <div class="sidebar-section-label">Geçmiş Oturumlar</div>
-    <div class="session-list" id="session-list">
-      <!-- Filled by JS -->
+    <div class="sys-status">
+      <div class="sys-header">System Status <span class="status-dot"></span><span class="status-text">Optimal</span></div>
+      <div class="sys-bar"><div class="sys-label">CPU</div><div class="bar-bg"><div class="bar-fill" style="width: 23%"></div></div><div class="sys-val">23%</div></div>
+      <div class="sys-bar"><div class="sys-label">MEM</div><div class="bar-bg"><div class="bar-fill" style="width: 41%"></div></div><div class="sys-val">41%</div></div>
+      <div class="sys-bar"><div class="sys-label">NET</div><div class="bar-bg"><div class="bar-fill" style="width: 18%"></div></div><div class="sys-val">18%</div></div>
     </div>
 
-    <div class="sidebar-footer">
-      <div class="user-chip" id="user-chip">
-        <div class="user-avatar" id="sidebar-avatar">?</div>
-        <span id="sidebar-username">—</span>
+    <div class="dash-profile" onclick="logout()">
+      <div class="dp-avatar" id="sidebar-avatar">?</div>
+      <div class="dp-info">
+        <span class="dp-name" id="sidebar-username">User</span>
+        <span class="dp-role">Core Contributor</span>
       </div>
-      <button class="btn-icon-ghost" onclick="logout()" title="Çıkış">
-        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
-    </div>
-  </aside>
-
-  <!-- ── Main Chat Area ── -->
-  <main class="chat-area">
-
-    <!-- Chat Header -->
-    <header class="chat-header" id="chat-header">
-      <div class="agent-identity" id="agent-identity">
-        <div class="agent-icon-lg" id="header-agent-icon">🔮</div>
-        <div>
-          <h2 id="header-agent-name">Konsey</h2>
-          <p id="header-agent-desc" class="agent-desc">Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın</p>
-        </div>
-      </div>
-      <div class="chat-header-actions">
-        <button class="btn-ghost-sm" onclick="newSession()" title="Yeni oturum" id="btn-new-session">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Yeni Oturum
-        </button>
-      </div>
-    </header>
-
-    <!-- Messages -->
-    <div class="messages-area" id="messages-area">
-      <!-- Welcome state -->
-      <div class="welcome-state" id="welcome-state">
-        <div class="welcome-emblem">◈</div>
-        <h2 class="welcome-title">Konseyin sizi bekliyor.</h2>
-        <p class="welcome-sub">Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın.<br>Konsey, sorunuzu otomatik olarak ilgili uzmana yönlendirir.</p>
-        <div class="agent-quick-grid" id="agent-quick-grid">
-          <!-- Filled by JS -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Input -->
-    <div class="chat-input-area">
-      <div class="input-agent-badge" id="input-agent-badge">
-        <span id="badge-icon">🔮</span>
-        <span id="badge-name">Otomatik</span>
-        <button class="badge-clear" onclick="clearAgentFilter()" id="badge-clear">✕</button>
-      </div>
-      <div class="chat-input-wrapper">
-        <textarea
-          id="chat-input"
-          class="chat-input"
-          placeholder="Konseye sorunuzu yazın…"
-          rows="1"
-          onkeydown="handleInputKey(event)"
-          oninput="autoResize(this)"
-        ></textarea>
-        <button class="btn-send" id="btn-send" onclick="sendMessage()" title="Gönder">
-          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </div>
-      <div class="input-hint">Konsey yanıtları bilgi amaçlıdır. Tüm kararlar size aittir.</div>
-    </div>
-  </main>
-
-  <!-- ── Right Panel: Insights ── -->
-  <aside class="right-panel" id="right-panel">
-    <div class="panel-header">
-      <h3>Proaktif İçgörüler</h3>
-      <div class="insight-badge" id="insight-count-badge">0</div>
-    </div>
-    <div class="insight-feed" id="insight-feed">
-      <div class="insight-empty">
-        <span>🔮</span>
-        <p>Konsey içgörüleri burada görünür.<br>Konsey sizi düzenli olarak dinler.</p>
-      </div>
-    </div>
-
-    <div class="panel-section">
-      <h3>Profil</h3>
-      <div id="profile-summary" class="profile-summary">
-        <button class="btn-outline-sm" onclick="openProfileModal()">Profili Düzenle</button>
-      </div>
+      <div class="dp-dots">⋮</div>
     </div>
   </aside>
 
+  <!-- ── Main Area ── -->
+  <div class="dash-main-area">
+    
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboard-view" class="view-active">
+      <header class="dash-header">
+        <div class="dh-titles">
+          <h1>InnerCircle-AGI</h1>
+          <p>Towards a Collaborative AGI Future</p>
+        </div>
+        <div class="dh-actions">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search anything...">
+            <span class="search-shortcut">⌘K</span>
+          </div>
+          <button class="icon-btn">🔔</button>
+          <button class="icon-btn">📈</button>
+          <button class="btn-primary-glow">+ New Task</button>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+        
+        <!-- Center Top: Mind Core -->
+        <div class="dash-card mind-core-card">
+          <div class="card-head">
+            <h3>Mind Core</h3>
+            <span class="status-pill"><span class="dot"></span>Online</span>
+          </div>
+          <div class="mind-core-viz">
+            <div class="orbit orbit-1"></div>
+            <div class="orbit orbit-2"></div>
+            <div class="orbit orbit-3"></div>
+            
+            <div class="core-orb">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            </div>
+
+            <!-- Nodes -->
+            <div class="mc-node node-memory">
+              <div class="node-icon">💾</div>
+              <div class="node-text">Memory<span>68%</span></div>
+            </div>
+            <div class="mc-node node-reasoning">
+              <div class="node-icon">🧠</div>
+              <div class="node-text">Reasoning<span>Active</span></div>
+            </div>
+            <div class="mc-node node-planning">
+              <div class="node-icon">📋</div>
+              <div class="node-text">Planning<span>72%</span></div>
+            </div>
+            <div class="mc-node node-learning">
+              <div class="node-icon">📚</div>
+              <div class="node-text">Learning<span>81%</span></div>
+            </div>
+            <div class="mc-node node-reflection">
+              <div class="node-icon">👁</div>
+              <div class="node-text">Self-Reflection<span>Active</span></div>
+            </div>
+          </div>
+          <div class="mc-footer">InnerCircle-AGI is thinking, learning and evolving.</div>
+        </div>
+
+        <!-- Center Bottom Left: Active Agents -->
+        <div class="dash-card active-agents-card">
+          <div class="card-head">
+            <h3>Active Agents</h3>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="agent-list">
+            <div class="aa-item" onclick="openAgentChat('research')">
+              <div class="aa-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">🔍</div>
+              <div class="aa-info"><h4>Research Agent</h4><span>Running</span></div>
+              <div class="aa-spark"><svg viewBox="0 0 40 10"><polyline points="0,5 10,2 20,8 30,3 40,6" fill="none" stroke="#3b82f6" stroke-width="1.5"/></svg></div>
+              <div class="aa-arrow">›</div>
+            </div>
+            <div class="aa-item" onclick="openAgentChat('code')">
+              <div class="aa-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">&lt;/&gt;</div>
+              <div class="aa-info"><h4>Code Agent</h4><span>Running</span></div>
+              <div class="aa-spark"><svg viewBox="0 0 40 10"><polyline points="0,8 10,2 20,5 30,1 40,4" fill="none" stroke="#8b5cf6" stroke-width="1.5"/></svg></div>
+              <div class="aa-arrow">›</div>
+            </div>
+            <div class="aa-item" onclick="openAgentChat('learning')">
+              <div class="aa-icon" style="background: rgba(236,72,153,0.1); color: #ec4899;">🧠</div>
+              <div class="aa-info"><h4>Learning Agent</h4><span>Training</span></div>
+              <div class="aa-spark"><svg viewBox="0 0 40 10"><polyline points="0,2 10,8 20,4 30,7 40,2" fill="none" stroke="#ec4899" stroke-width="1.5"/></svg></div>
+              <div class="aa-arrow">›</div>
+            </div>
+            <div class="aa-item" onclick="openAgentChat('security')">
+              <div class="aa-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">🛡</div>
+              <div class="aa-info"><h4>Security Agent</h4><span style="color:#f59e0b">Monitoring</span></div>
+              <div class="aa-spark"><svg viewBox="0 0 40 10"><polyline points="0,5 10,5 20,2 30,8 40,5" fill="none" stroke="#f59e0b" stroke-width="1.5"/></svg></div>
+              <div class="aa-arrow">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Bottom Right: Recent Tasks -->
+        <div class="dash-card recent-tasks-card">
+          <div class="card-head">
+            <h3>Recent Tasks</h3>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <div class="task-info">Build adaptive memory system</div>
+              <div class="task-status status-progress">In Progress</div>
+              <div class="task-pct">45%</div>
+            </div>
+            <div class="task-bar"><div class="tb-fill" style="width:45%; background:#8b5cf6"></div></div>
+            
+            <div class="task-item" style="margin-top:14px">
+              <div class="task-info">Analyze benchmark results</div>
+              <div class="task-status status-completed">Completed</div>
+              <div class="task-pct" style="color:#10b981">✓</div>
+            </div>
+            <div class="task-bar"><div class="tb-fill" style="width:100%; background:#10b981"></div></div>
+            
+            <div class="task-item" style="margin-top:14px">
+              <div class="task-info">Improve reasoning accuracy</div>
+              <div class="task-status status-progress">In Progress</div>
+              <div class="task-pct">70%</div>
+            </div>
+            <div class="task-bar"><div class="tb-fill" style="width:70%; background:#8b5cf6"></div></div>
+            
+            <div class="task-item" style="margin-top:14px">
+              <div class="task-info">Integrate new tools</div>
+              <div class="task-status status-pending">Pending</div>
+              <div class="task-pct">10%</div>
+            </div>
+            <div class="task-bar"><div class="tb-fill" style="width:10%; background:#f59e0b"></div></div>
+          </div>
+        </div>
+
+        <!-- Right Top: Activity Stream -->
+        <div class="dash-card activity-stream-card">
+          <div class="card-head">
+            <h3>Activity Stream</h3>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="activity-list">
+            <div class="act-item">
+              <div class="act-icon success">✓</div>
+              <div class="act-info">
+                <h4>Research Agent completed a task</h4>
+                <p>Deep research on AGI safety mechanisms</p>
+              </div>
+              <div class="act-time">2m ago</div>
+            </div>
+            <div class="act-item">
+              <div class="act-icon code">&lt;/&gt;</div>
+              <div class="act-info">
+                <h4>Code Agent pushed a new module</h4>
+                <p>memory-compression v1.3.0</p>
+              </div>
+              <div class="act-time">7m ago</div>
+            </div>
+            <div class="act-item">
+              <div class="act-icon brain">🧠</div>
+              <div class="act-info">
+                <h4>Mind Core updated a belief</h4>
+                <p>New insight about human-AI collaboration</p>
+              </div>
+              <div class="act-time">15m ago</div>
+            </div>
+            <div class="act-item">
+              <div class="act-icon learn">📚</div>
+              <div class="act-info">
+                <h4>Learning Agent discovered new pattern</h4>
+                <p>Improved reasoning chain efficiency</p>
+              </div>
+              <div class="act-time">31m ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Middle: Inner Circle Network -->
+        <div class="dash-card network-card">
+          <div class="card-head">
+            <h3>Inner Circle Network</h3>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="network-viz">
+            <div class="net-line l1"></div><div class="net-line l2"></div><div class="net-line l3"></div>
+            <div class="net-center">◈</div>
+            <div class="net-node n1"></div><div class="net-node n2"></div><div class="net-node n3"></div>
+            <div class="net-node n4"></div><div class="net-node n5"></div>
+          </div>
+          <div class="network-footer">
+            <span class="net-status"><span class="dot"></span>24 Members Online</span>
+            <button class="btn-outline-sm">Go to Inner Circle</button>
+          </div>
+        </div>
+
+        <!-- Right Bottom: System Insight -->
+        <div class="dash-card system-insight-card">
+          <div class="card-head">
+            <h3>System Insight</h3>
+            <span class="dropdown">This Week ▾</span>
+          </div>
+          <div class="insight-cols">
+            <div class="inc-col">
+              <h4>Knowledge Growth</h4>
+              <div class="inc-val">+2.45 <span>TB</span></div>
+              <div class="inc-sub">+17.6% vs last week</div>
+              <div class="inc-chart-line">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 Q10,20 20,25 T40,15 T60,20 T80,5 T100,0" fill="none" stroke="#8b5cf6" stroke-width="2"/><path d="M0,30 L0,25 Q10,20 20,25 T40,15 T60,20 T80,5 T100,0 L100,30 Z" fill="url(#grad)"/></svg>
+                <svg width="0" height="0"><defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient></defs></svg>
+              </div>
+            </div>
+            <div class="inc-col">
+              <h4>Reasoning Accuracy</h4>
+              <div class="inc-val">92.7%</div>
+              <div class="inc-sub" style="color:#10b981">+4.3% vs last week</div>
+              <div class="inc-donut">
+                <svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="4"/><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="92.7, 100"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="insight-footer">
+            <span class="star-icon">✨</span>
+            <p>The system shows steady improvement.<br>Continue empowering the Inner Circle.</p>
+          </div>
+        </div>
+
+      </div>
+      
+      <div class="dash-bottom-tag">A Collaborative Path to AGI</div>
+    </div>
+
+    <!-- CHAT VIEW (Hidden by default, holds original chat) -->
+    <div id="chat-view" class="view-hidden">
+      <!-- ── Main Chat Area ── -->
+      <main class="chat-area" style="width:100%; height:100%; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; background: rgba(13,18,37,0.6); backdrop-filter: blur(20px);">
+        <!-- Chat Header -->
+        <header class="chat-header" id="chat-header">
+          <button class="btn-icon-ghost" onclick="switchView('dashboard')" style="margin-right: 10px;">←</button>
+          <div class="agent-identity" id="agent-identity">
+            <div class="agent-icon-lg" id="header-agent-icon">🔮</div>
+            <div>
+              <h2 id="header-agent-name">Konsey</h2>
+              <p id="header-agent-desc" class="agent-desc">Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın</p>
+            </div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="btn-ghost-sm" onclick="newSession()" title="Yeni oturum" id="btn-new-session">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Yeni Oturum
+            </button>
+          </div>
+        </header>
+
+        <!-- Messages -->
+        <div class="messages-area" id="messages-area">
+          <div class="welcome-state" id="welcome-state">
+            <div class="welcome-emblem">◈</div>
+            <h2 class="welcome-title">Konseyin sizi bekliyor.</h2>
+            <p class="welcome-sub">Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın.</p>
+            <div class="agent-quick-grid" id="agent-quick-grid"></div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+          <div class="input-agent-badge" id="input-agent-badge">
+            <span id="badge-icon">🔮</span>
+            <span id="badge-name">Otomatik</span>
+            <button class="badge-clear" onclick="clearAgentFilter()" id="badge-clear">✕</button>
+          </div>
+          <div class="chat-input-wrapper">
+            <textarea id="chat-input" class="chat-input" placeholder="Konseye sorunuzu yazın…" rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="btn-send" id="btn-send" onclick="sendMessage()" title="Gönder">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="input-hint">Konsey yanıtları bilgi amaçlıdır. Tüm kararlar size aittir.</div>
+        </div>
+      </main>
+    </div>
+
+  </div>
 </div>
 
 <!-- ════════════ PROFILE MODAL ════════════ -->
