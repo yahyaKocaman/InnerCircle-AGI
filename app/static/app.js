@@ -140,6 +140,10 @@ function switchView(viewName) {
   }
 }
 
+function openComingSoon(featureName) {
+  showToast(`${featureName} modülü henüz yapım aşamasında.`, 'info');
+}
+
 function openAgentChat(agentType) {
   switchView('chat');
   
