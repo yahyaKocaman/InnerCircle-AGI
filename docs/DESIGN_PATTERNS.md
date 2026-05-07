@@ -33,7 +33,7 @@ classDiagram
         +health_check() dict
     }
     
-    class "Module-Level Singleton" as Singleton {
+    class Singleton["Module-Level Singleton"] {
         +llm: OpenAIClient
     }
     

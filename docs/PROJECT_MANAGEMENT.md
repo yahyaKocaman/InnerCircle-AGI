@@ -58,7 +58,7 @@ gantt
 
 | Ekip Üyesi | Öğrenci No | Sorumluluk Alanı | Sprint Katılımı |
 |------------|------------|------------------|-----------------|
-| **Yahya Kocaman** | B2180.060025 | Proje Lideri, Backend Mimarisi, API Tasarımı | S1-S7 |
+| **Yahya Kocaman** | B2180.060025 | Backend Mimarisi, API Tasarımı | S1-S7 |
 | **Onur Balcı** | B2180.060043 | AI Agent Sistemi, LangGraph Orkestrasyon, Routing Logic | S3-S4 |
 | **Erdem Bakırcı** | B2180.060051 | Frontend SPA, UI/UX Tasarımı, SSE Streaming | S5 |
 | **Tolga Ertunç** | B2280.060052 | DevOps, Docker, CI/CD Pipeline, Deployment | S2, S6 |
