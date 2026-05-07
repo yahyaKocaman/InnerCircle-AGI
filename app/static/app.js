@@ -117,6 +117,7 @@ function switchView(viewName) {
   const dashView = document.getElementById('dashboard-view');
   const chatView = document.getElementById('chat-view');
   const navItems = document.querySelectorAll('.dash-nav .nav-item');
+  const agentNav = document.getElementById('agent-nav');
   
   if(!dashView || !chatView) return;
 
@@ -128,12 +129,14 @@ function switchView(viewName) {
     chatView.classList.remove('view-active');
     chatView.classList.add('view-hidden');
     navItems[0].classList.add('active');
+    if(agentNav) agentNav.classList.add('hidden');
   } else if (viewName === 'chat') {
     dashView.classList.remove('view-active');
     dashView.classList.add('view-hidden');
     chatView.classList.remove('view-hidden');
     chatView.classList.add('view-active');
     navItems[1].classList.add('active');
+    if(agentNav) agentNav.classList.remove('hidden');
   }
 }
 
@@ -176,10 +179,14 @@ async function loadAgents() {
 
 function renderAgentNav() {
   const nav = document.getElementById('agent-nav');
-  nav.innerHTML = agentMetadata.map(a => `
+  if (!nav) return;
+  
+  const defaultAgentIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`;
+  
+  nav.innerHTML = '<div style="padding: 12px 14px 6px; font-size: 10px; font-weight: 600; color: var(--dash-muted); text-transform: uppercase; letter-spacing: 1px;">Konsey Üyeleri</div>' + agentMetadata.map(a => `
     <div class="agent-nav-item ${currentAgentRole === a.role ? 'active' : ''}"
          onclick="selectAgent('${a.role}')" id="nav-${a.role}">
-      <span class="agent-nav-icon">${a.icon}</span>
+      <span class="agent-nav-icon">${defaultAgentIcon}</span>
       <div class="agent-nav-info">
         <div class="agent-nav-name">${a.name}</div>
         <div class="agent-nav-role">${a.title}</div>
@@ -193,14 +200,14 @@ function renderAgentNav() {
   autoEl.id = 'nav-auto';
   autoEl.onclick = () => clearAgentFilter();
   autoEl.innerHTML = `
-    <span class="agent-nav-icon">🔮</span>
+    <span class="agent-nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
     <div class="agent-nav-info">
       <div class="agent-nav-name">Otomatik Yönlendirme</div>
       <div class="agent-nav-role">Sentezci</div>
     </div>
     <div class="agent-nav-dot" style="background:#6B7280"></div>
   `;
-  nav.insertBefore(autoEl, nav.firstChild);
+  nav.insertBefore(autoEl, nav.childNodes[1]);
 }
 
 function renderAgentQuickGrid() {

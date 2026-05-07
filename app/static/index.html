@@ -91,8 +91,13 @@
   <!-- ── Left Sidebar (Dashboard) ── -->
   <aside class="dash-sidebar">
     <div class="dash-logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--dash-neon)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path>
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 50 10 A 40 40 0 0 0 50 90 L 50 75 A 25 25 0 0 1 50 25 Z" fill="var(--dash-neon)"/>
+        <path d="M 50 35 A 15 15 0 0 0 50 65 L 50 55 A 5 5 0 0 1 50 45 Z" fill="var(--dash-neon)"/>
+        <circle cx="65" cy="50" r="6" fill="var(--dash-neon)"/>
+        <path d="M 72 35 L 85 25 L 90 32 L 77 42 Z" fill="var(--dash-neon)"/>
+        <path d="M 75 50 L 95 45 L 95 55 Z" fill="var(--dash-neon)"/>
+        <path d="M 72 65 L 85 75 L 90 68 L 77 58 Z" fill="var(--dash-neon)"/>
       </svg>
       <div class="logo-text">
         <span class="logo-title">InnerCircle</span>
@@ -112,6 +117,10 @@
       <a href="#" class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span> Governance</a>
       <a href="#" class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings</a>
     </nav>
+
+    <div id="agent-nav" class="agent-nav hidden">
+      <!-- Agent list will be populated here via JavaScript -->
+    </div>
 
     <div class="sys-status">
       <div class="sys-header">System Status <span class="status-dot"></span><span class="status-text">Optimal</span></div>
@@ -166,7 +175,14 @@
             <div class="orbit orbit-3"></div>
             
             <div class="core-orb">
-               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+               <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M 50 10 A 40 40 0 0 0 50 90 L 50 75 A 25 25 0 0 1 50 25 Z" fill="currentColor"/>
+                 <path d="M 50 35 A 15 15 0 0 0 50 65 L 50 55 A 5 5 0 0 1 50 45 Z" fill="currentColor"/>
+                 <circle cx="65" cy="50" r="6" fill="currentColor"/>
+                 <path d="M 72 35 L 85 25 L 90 32 L 77 42 Z" fill="currentColor"/>
+                 <path d="M 75 50 L 95 45 L 95 55 Z" fill="currentColor"/>
+                 <path d="M 72 65 L 85 75 L 90 68 L 77 58 Z" fill="currentColor"/>
+               </svg>
             </div>
 
             <!-- Nodes -->
