@@ -2,6 +2,10 @@
 
 > **"Tek bir yapay zeka değil, senin adına düşünen ve her alanda uzman olan bir konsey."**
 
+<div align="center">
+  <img src="docs/dashboard.png" alt="InnerCircle AGI Dashboard" width="800">
+</div>
+
 InnerCircle AGI, hayatınızın farklı alanlarına odaklanan, her biri kendi uzmanlığına sahip 6 ayrı yapay zeka ajanından oluşan kapalı ve özel bir "Danışma Kurulu"dur. Amacı, size sıradan chatbotlar gibi "şu kodu yaz, şu çeviriyi yap" demek yerine; hayatınızın gidişatı, yatırımlarınız, sağlığınız ve kariyeriniz hakkında **derin, veri odaklı ve proaktif (siz sormadan da düşünen)** akıl hocalığı yapmaktır.
 
 **Projenin temel felsefesi şudur:** Sistemin hiçbir üyesi sizin hayatınıza müdahale etmez veya size kararlar dayatmaz. Yalnızca beklenmedik bağlantılar kurar, size farklı ve ufuk açıcı bir perspektif sunar.
