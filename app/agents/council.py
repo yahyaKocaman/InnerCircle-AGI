@@ -9,7 +9,7 @@ Flow:
       ↓
   [router] → classify intent → choose agent
       ↓
-  [agent_node] → retrieve memory → ollama → store memory
+  [agent_node] → retrieve memory → OpenAI GPT → store memory
       ↓
   [synthesizer_node] (optional, for cross-domain queries)
       ↓

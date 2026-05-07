@@ -283,13 +283,74 @@ a { color: inherit; text-decoration: none; }
   grid-template-columns: var(--sidebar-w) 1fr var(--right-panel-w);
   height: 100vh;
   overflow: hidden;
+  position: relative;
+  background: transparent;
+}
+
+/* ── Cyber Background Layer ── */
+.cyber-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--bg-base);
+  overflow: hidden;
+}
+.cyber-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  width: 600px;
+  height: 600px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--gold);
+  transition: background 1.5s ease-in-out;
+  animation: cyberOrbFloat 10s ease-in-out infinite;
+}
+@keyframes cyberOrbFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, -52%) scale(1.1); }
+}
+
+/* ── Matrix Overlay ── */
+.matrix-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace, Courier;
+  color: var(--gold);
+  font-size: 24px;
+  letter-spacing: 4px;
+  animation: matrixFadeOut 1.5s forwards;
+  animation-delay: 1.5s;
+}
+.matrix-text {
+  animation: glitchText 0.1s linear infinite;
+}
+@keyframes matrixFadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+@keyframes glitchText {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(-1px, -1px); }
+  60% { transform: translate(2px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0); }
 }
 
 /* ══════════════════════════════════════════════════════════════
    LEFT SIDEBAR
    ══════════════════════════════════════════════════════════════ */
 .sidebar {
-  background: var(--bg-elevated);
+  background: rgba(13, 18, 37, 0.6);
+  backdrop-filter: blur(20px);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -473,7 +534,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-base);
+  background: transparent;
 }
 
 /* Chat Header */
@@ -625,19 +686,22 @@ a { color: inherit; text-decoration: none; }
 .msg-time { font-size: 11px; color: var(--text-muted); }
 
 .msg-bubble {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
+  background: rgba(17, 23, 40, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px 20px;
   font-size: 14px;
   line-height: 1.7;
   color: var(--text-primary);
   white-space: pre-wrap;
   word-break: break-word;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 .message.user .msg-bubble {
-  background: var(--gold-dim);
-  border-color: var(--gold-border);
+  background: rgba(201, 168, 76, 0.08);
+  border-color: rgba(201, 168, 76, 0.25);
   border-bottom-right-radius: 4px;
   color: var(--text-primary);
 }
@@ -762,7 +826,8 @@ a { color: inherit; text-decoration: none; }
    RIGHT PANEL
    ══════════════════════════════════════════════════════════════ */
 .right-panel {
-  background: var(--bg-elevated);
+  background: rgba(13, 18, 37, 0.6);
+  backdrop-filter: blur(20px);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -1132,4 +1197,260 @@ a { color: inherit; text-decoration: none; }
 .chat-header {
   border-bottom-color: color-mix(in srgb, var(--agent-accent, transparent) 20%, var(--border));
   transition: border-bottom-color 0.3s;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PREMIUM ENHANCEMENTS — Micro-animations & Visual Polish
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Shimmer Loading Effect ───────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-loading {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+/* ── Agent Nav — Glow on hover ────────────────────────────────── */
+.agent-nav-item {
+  --agent-nav-color: var(--text-muted);
+}
+.agent-nav-item:hover {
+  box-shadow: inset 2px 0 0 var(--agent-nav-color);
+}
+.agent-nav-item.active {
+  box-shadow: inset 2px 0 0 var(--gold),
+              0 0 12px rgba(201, 168, 76, 0.08);
+}
+
+/* ── Agent Quick Grid Cards — Glow accent ──────────────────────── */
+.agent-quick-card {
+  position: relative;
+  overflow: hidden;
+}
+.agent-quick-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--agent-color, var(--gold));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.agent-quick-card:hover::before {
+  opacity: 1;
+}
+.agent-quick-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 60%;
+  height: 30%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--agent-color, var(--gold)) 15%, transparent), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.agent-quick-card:hover::after {
+  opacity: 1;
+}
+
+/* ── Message Bubble — Entrance stagger ──────────────────────── */
+.message:nth-child(1) { animation-delay: 0s; }
+.message:nth-child(2) { animation-delay: 0.05s; }
+.message:nth-child(3) { animation-delay: 0.1s; }
+.message:nth-child(4) { animation-delay: 0.15s; }
+.message:nth-child(5) { animation-delay: 0.2s; }
+
+/* ── Sidebar Brand — Subtle glow ───────────────────────────── */
+.sidebar-emblem {
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.sidebar-emblem:hover {
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.3);
+  transform: scale(1.05);
+}
+
+/* ── Auth Card — Premium entrance ──────────────────────────── */
+@keyframes authCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+.auth-card {
+  animation: authCardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Auth Emblem — Pulse ring ─────────────────────────────── */
+.auth-emblem {
+  position: relative;
+}
+.auth-emblem::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  border: 1px solid var(--gold-border);
+  opacity: 0;
+  animation: emblemPulse 3s ease-in-out infinite;
+}
+@keyframes emblemPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.08); }
+}
+
+/* ── Send Button — Ripple effect ──────────────────────────── */
+.btn-send {
+  position: relative;
+  overflow: hidden;
+}
+.btn-send::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 0.4s, opacity 0.4s;
+}
+.btn-send:active::after {
+  opacity: 1;
+  transform: scale(2);
+  transition: transform 0.1s, opacity 0s;
+}
+
+/* ── Streaming — Enhanced glow border ──────────────────────── */
+@keyframes streamGlow {
+  0%, 100% { box-shadow: 0 0 0 1px var(--gold-dim), 0 0 8px rgba(201,168,76,0.05); }
+  50%      { box-shadow: 0 0 0 1px var(--gold-border), 0 0 16px rgba(201,168,76,0.12); }
+}
+.message.streaming .msg-bubble {
+  animation: streamGlow 2s ease-in-out infinite;
+}
+
+/* ── Insight Card — Entrance animation ──────────────────────── */
+@keyframes insightSlideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.insight-card {
+  animation: insightSlideIn 0.4s ease-out;
+}
+.insight-card.unread::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--gold);
+}
+
+/* ── Welcome State — Floating particles ────────────────────── */
+@keyframes welcomeFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%      { transform: translateY(-8px) rotate(2deg); }
+  75%      { transform: translateY(4px) rotate(-1deg); }
+}
+.welcome-emblem {
+  animation: welcomeFloat 4s ease-in-out infinite;
+}
+
+/* ── Toast — Enhanced entrance ──────────────────────────────── */
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.toast {
+  animation: toastSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Modal — Premium open animation ─────────────────────────── */
+@keyframes modalOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modalCardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-overlay {
+  animation: modalOverlayIn 0.25s ease-out;
+}
+.modal-card {
+  animation: modalCardIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Session Item — Hover line indicator ────────────────────── */
+.session-item {
+  position: relative;
+  transition: all 0.2s, padding-left 0.2s;
+}
+.session-item:hover {
+  padding-left: 16px;
+}
+.session-item::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  width: 2px;
+  height: 0;
+  background: var(--gold);
+  border-radius: 1px;
+  transition: height 0.2s, transform 0.2s;
+  transform: translateY(-50%);
+}
+.session-item:hover::before {
+  height: 60%;
+}
+.session-item.active::before {
+  height: 60%;
+  background: var(--gold);
+}
+
+/* ── Focus Ring — Global accessibility ──────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar — App-wide polish ────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+/* ── Selection Color ────────────────────────────────────────── */
+::selection {
+  background: rgba(201, 168, 76, 0.3);
+  color: var(--text-primary);
 }

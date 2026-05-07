@@ -189,6 +189,10 @@ function selectAgent(role) {
     document.getElementById('header-agent-desc').textContent = agent.description;
     document.getElementById('header-agent-icon').style.borderColor = `${agent.color}40`;
     document.getElementById('chat-header').style.setProperty('--agent-accent', agent.color);
+    
+    // WOW factor: Update global cyber orb color to match agent
+    const orb = document.getElementById('global-cyber-orb');
+    if (orb) orb.style.background = agent.color;
   }
 
   const badge = document.getElementById('input-agent-badge');
@@ -210,6 +214,11 @@ function clearAgentFilter() {
   document.getElementById('header-agent-name').textContent = 'Konsey';
   document.getElementById('header-agent-desc').textContent = 'Bir konsey üyesi seçin ya da doğrudan yazmaya başlayın';
   document.getElementById('header-agent-icon').style.borderColor = '';
+  document.getElementById('chat-header').style.setProperty('--agent-accent', 'transparent');
+
+  // WOW factor: Reset orb to gold for Synthesizer (Auto)
+  const orb = document.getElementById('global-cyber-orb');
+  if (orb) orb.style.background = '#c9a84c';
 
   const badge = document.getElementById('input-agent-badge');
   badge.classList.remove('has-agent');
@@ -616,7 +625,7 @@ function finalizeStreamingMessage(msgEl, answerText, agent) {
   // Show model badge
   const modelBadge = msgEl.querySelector('[id$="-model-badge"]');
   if (modelBadge) {
-    modelBadge.textContent = '⚡ deepseek-r1:8b · ollama';
+    modelBadge.textContent = '⚡ gpt-4o-mini · openai';
     modelBadge.style.display = 'block';
   }
 }

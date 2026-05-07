@@ -12,6 +12,11 @@
 </head>
 <body>
 
+<!-- ── Loading Overlay ── -->
+<div id="matrix-overlay" class="matrix-overlay hidden">
+  <div class="matrix-text">SİSTEME BAĞLANILIYOR...</div>
+</div>
+
 <!-- ════════════ AUTH SCREEN ════════════ -->
 <div id="auth-screen" class="auth-screen">
   <div class="auth-bg">
@@ -81,6 +86,12 @@
 
 <!-- ════════════ APP SCREEN ════════════ -->
 <div id="app-screen" class="app-screen hidden">
+  
+  <!-- Cyber Background Layer -->
+  <div class="cyber-bg-layer">
+    <div class="auth-grid"></div>
+    <div class="cyber-orb" id="global-cyber-orb"></div>
+  </div>
 
   <!-- ── Left Sidebar: Council Members ── -->
   <aside class="sidebar">

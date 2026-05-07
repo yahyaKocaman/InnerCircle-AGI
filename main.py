@@ -16,7 +16,7 @@ from app.core.limiter import limiter
 from app.core.middleware import SecurityHeadersMiddleware, RequestLoggingMiddleware
 from app.infrastructure.database import Base, engine
 from app.infrastructure.chroma_client import get_chroma_client
-from app.infrastructure.ollama_client import ollama
+from app.infrastructure.openai_client import llm
 from app.api import auth
 from app.api import council, insights, profile
 from app.api.deps import get_db
@@ -32,11 +32,11 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     # ChromaDB — create collections for all agents
     get_chroma_client()
-    # Log Ollama status
+    # Log LLM status
     import logging
     logger = logging.getLogger(__name__)
-    ollama_status = await ollama.health_check()
-    logger.info(f"Ollama status: {ollama_status['status']} | model={ollama_status.get('configured_model')}")
+    llm_status = await llm.health_check()
+    logger.info(f"LLM status: {llm_status['status']} | model={llm_status.get('configured_model')}")
     yield
 
 
@@ -55,9 +55,9 @@ Not a single AI. A council of 6 specialist agents thinking on your behalf.
 | **REST API** | FastAPI, OpenAPI 3.1, versioned endpoints, SSE streaming |
 | **Containerization** | Docker + Docker Compose (app, db, redis, celery) |
 | **CI/CD** | GitHub Actions: lint → test → build → publish |
-| **Observability** | Prometheus metrics, structured logging, Ollama latency histogram |
+| **Observability** | Prometheus metrics, structured logging, LLM latency histogram |
 | **Security** | JWT (HS256), bcrypt, rate limiting, OWASP security headers |
-| **AI Integration** | LangGraph multi-agent swarm + Ollama (qwen2.5:7b) + ChromaDB memory |
+| **AI Integration** | LangGraph multi-agent swarm + OpenAI GPT-4o-mini + ChromaDB memory |
 
 ### Council Members
 | Agent | Expertise |
@@ -106,7 +106,6 @@ app.include_router(profile.router,  prefix="/profile")
 Instrumentator(
     should_group_status_codes=True,
     should_ignore_untemplated=True,
-    should_respect_env_var=True,
     should_instrument_requests_inprogress=True,
 ).instrument(app).expose(app)
 
@@ -125,7 +124,7 @@ if os.path.isdir(static_dir):
 async def health(db: Session = Depends(get_db)):
     """
     Detailed health check for load balancers and monitoring.
-    Checks: API, database, Ollama LLM connectivity.
+    Checks: API, database, OpenAI LLM connectivity.
     """
     db_status = "ok"
     try:
@@ -133,11 +132,11 @@ async def health(db: Session = Depends(get_db)):
     except Exception:
         db_status = "error"
 
-    ollama_info = await ollama.health_check()
-    ollama_status = ollama_info.get("status", "unknown")
+    llm_info = await llm.health_check()
+    llm_status = llm_info.get("status", "unknown")
 
     overall = "ok" if db_status == "ok" else "degraded"
-    if ollama_status != "ok":
+    if llm_status != "ok":
         overall = "degraded"
 
     return {
@@ -148,8 +147,8 @@ async def health(db: Session = Depends(get_db)):
         "components": {
             "api":            "ok",
             "database":       db_status,
-            "ollama":         ollama_status,
-            "ollama_model":   settings.OLLAMA_MODEL,
-            "model_available": ollama_info.get("model_available", False),
+            "llm":            llm_status,
+            "llm_model":      settings.OPENAI_MODEL,
+            "model_available": llm_info.get("model_available", False),
         },
     }

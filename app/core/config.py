@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # ── Database ──────────────────────────────────────────────
-    DATABASE_URL: str = "sqlite:///./innercircle.db"
+    DATABASE_URL: str = "sqlite:///C:/tmp/innercircle.db"
 
     # ── Security ──────────────────────────────────────────────
     SECRET_KEY: str = "changeme-super-secret-key-min-32-chars!!"
@@ -18,10 +18,11 @@ class Settings(BaseSettings):
     # ── Rate Limiting ────────────────────────────────────────
     RATE_LIMIT_PER_MINUTE: int = 60
 
-    # ── Ollama (Local LLM) ───────────────────────────────────
-    OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
-    OLLAMA_MODEL: str = "deepseek-r1:8b"
-    OLLAMA_TIMEOUT: int = 120  # seconds
+    # ── OpenAI (LLM) ─────────────────────────────────────────
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    OPENAI_TIMEOUT: int = 120  # seconds
+    OPENAI_MAX_TOKENS: int = 4096
 
     # ── ChromaDB (Vector Memory) ─────────────────────────────
     CHROMA_PERSIST_DIR: str = "./chroma_data"
@@ -38,7 +39,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
-        extra = "ignore"   # Ollama system env vars (OLLAMA_MODELS etc.) must not break startup
+        extra = "ignore"   # System env vars must not break startup
 
 
 

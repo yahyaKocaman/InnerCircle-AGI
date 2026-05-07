@@ -59,9 +59,11 @@ def client(db_session):
             pass  # rollback handled in db_session fixture
 
     app.dependency_overrides[get_db] = override_get_db
+    app.state.limiter.enabled = False  # Disable rate limits during testing
     with TestClient(app, raise_server_exceptions=True) as c:
         yield c
     app.dependency_overrides.clear()
+    app.state.limiter.enabled = True
 
 
 # ── Reusable helpers ─────────────────────────────────────────

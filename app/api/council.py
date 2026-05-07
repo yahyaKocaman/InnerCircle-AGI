@@ -22,7 +22,7 @@ from app.domain.schemas import (
 )
 from app.agents.council import council
 from app.core.metrics import (
-    COUNCIL_QUERIES_TOTAL, AGENT_QUERY_COUNTER, OLLAMA_LATENCY
+    COUNCIL_QUERIES_TOTAL, AGENT_QUERY_COUNTER, LLM_LATENCY
 )
 
 router = APIRouter(tags=["Council"])
@@ -158,7 +158,7 @@ async def ask_council(
         raise HTTPException(status_code=503, detail=f"Council unavailable: {str(e)}")
     finally:
         elapsed = time.perf_counter() - start
-        OLLAMA_LATENCY.observe(elapsed)
+        LLM_LATENCY.observe(elapsed)
 
     # Update session role if auto-routed
     if session.agent_role != response.agent_role:

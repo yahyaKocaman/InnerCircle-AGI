@@ -16,11 +16,11 @@ version: "3.9"
 #   Default:              docker compose up -d
 #   With monitoring:      docker compose --profile monitoring up -d
 #
-# NOTE: Ollama runs locally on your host machine.
-#       Run these commands before starting:
-#         ollama pull deepseek-r1:8b
-#         ollama serve
-#
+# NOTE: This project uses OpenAI API (cloud-based).
+# Setup:
+#   1. Get API key from https://platform.openai.com/api-keys
+#   2. Set OPENAI_API_KEY in your .env file
+# ─────────────────────────────────────────────────────────────
 # Host is accessible from containers via: host.docker.internal
 
 x-common-env: &common-env
@@ -28,13 +28,11 @@ x-common-env: &common-env
   REDIS_URL: redis://redis:6379/0
   CELERY_BROKER_URL: redis://redis:6379/0
   CELERY_RESULT_BACKEND: redis://redis:6379/1
-  OLLAMA_BASE_URL: http://host.docker.internal:11434
-  OLLAMA_MODEL: deepseek-r1:8b
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  OPENAI_MODEL: gpt-4o-mini
+  OPENAI_TIMEOUT: 120
+  OPENAI_MAX_TOKENS: 4096
   CHROMA_PERSIST_DIR: /app/chroma_data
-
-x-common-extra-hosts: &common-extra-hosts
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
 
 services:
 
@@ -61,7 +59,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    <<: *common-extra-hosts
+
 
   db:
     image: postgres:16-alpine
@@ -108,7 +106,7 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
-    <<: *common-extra-hosts
+
 
   celery_beat:
     build: .
@@ -121,7 +119,7 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
-    <<: *common-extra-hosts
+
 
   # ── Monitoring (optional profile) ─────────────────────────
 

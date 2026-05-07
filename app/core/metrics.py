@@ -19,9 +19,9 @@ AGENT_QUERY_COUNTER = Counter(
     ["agent_role"],   # life_coach / investment / performance / career / health / synthesizer
 )
 
-OLLAMA_LATENCY = Histogram(
-    "innercircle_ollama_response_seconds",
-    "Ollama LLM response latency in seconds",
+LLM_LATENCY = Histogram(
+    "innercircle_llm_response_seconds",
+    "LLM response latency in seconds",
     buckets=[1, 2, 5, 10, 20, 30, 60, 120],
 )
 

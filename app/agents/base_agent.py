@@ -4,14 +4,11 @@ BaseAgent — Abstract foundation for all InnerCircle council members.
 Each agent:
   • Has a unique role, name, system prompt and tone.
   • Retrieves relevant past interactions from ChromaDB.
-  • Calls Ollama (DeepSeek-R1:8b) for generation.
+  • Calls OpenAI GPT for generation.
   • Stores the interaction back into memory.
 
-DeepSeek-R1 note:
-  The model pre-pends a <think>...</think> reasoning block.
-  ollama_client.py handles stripping/routing those tokens.
-  think_stream() recognises the __THINKING_START__ / __THINKING_END__
-  sentinels and yields them as special events for the SSE layer.
+Streaming:
+  think_stream() yields tokens via SSE for real-time UI rendering.
 """
 
 import logging
@@ -21,7 +18,7 @@ from datetime import datetime, timezone
 from typing import Optional, AsyncIterator
 
 from app.domain.models import AgentRole
-from app.infrastructure.ollama_client import ollama, THINK_START, THINK_END
+from app.infrastructure.openai_client import llm, THINK_START, THINK_END
 from app.infrastructure.chroma_client import get_memory, AgentMemory
 
 logger = logging.getLogger(__name__)
@@ -104,7 +101,7 @@ class BaseAgent(ABC):
         context: str,
         history: Optional[list[dict]] = None,
     ) -> list[dict]:
-        """Construct the message list for Ollama chat."""
+        """Construct the message list for OpenAI chat."""
         system = self.system_prompt
         if context:
             system += f"\n\n{context}"
@@ -129,24 +126,19 @@ class BaseAgent(ABC):
         history: Optional[list[dict]] = None,
         store_memory: bool = True,
     ) -> AgentResponse:
-        """Generate a response and optionally persist the interaction.
-        
-        DeepSeek-R1 <think> blocks are automatically stripped by
-        ollama_client.chat() before returning here.
-        """
+        """Generate a response and optionally persist the interaction."""
         context = self._build_context(user_id, message, profile_context)
         messages = self._build_messages(message, context, history)
 
         try:
-            response_text = await ollama.chat(messages=messages)
+            response_text = await llm.chat(messages=messages)
         except RuntimeError as e:
             response_text = (
-                f"Şu anda Ollama servisine bağlanılamıyor. "
-                f"Lütfen Ollama'nın çalıştığından emin olun "
-                f"(`ollama serve` ve `ollama pull deepseek-r1:8b`). Hata: {e}"
+                f"Şu anda AI servisine bağlanılamıyor. "
+                f"Lütfen API anahtarınızın geçerli olduğundan emin olun. Hata: {e}"
             )
 
-        if store_memory and response_text and not response_text.startswith("Şu anda Ollama"):
+        if store_memory and response_text and not response_text.startswith("Şu anda AI"):
             interaction = f"Kullanıcı: {message}\n{self.name}: {response_text}"
             self.memory.store(
                 user_id=user_id,
@@ -161,7 +153,7 @@ class BaseAgent(ABC):
             content=response_text,
             agent_role=self.role,
             agent_name=self.name,
-            model_used=f"ollama/{ollama.model}",
+            model_used=f"openai/{llm.model}",
             tokens_estimated=tokens_est,
         )
 
@@ -173,38 +165,19 @@ class BaseAgent(ABC):
         history: Optional[list[dict]] = None,
     ) -> AsyncIterator[str]:
         """
-        Stream tokens as they are generated.
-
-        Yields special sentinel tokens for the SSE layer:
-          __THINKING_START__  → UI opens CoT panel
-          __THINKING_END__    → UI closes CoT panel; answer begins
-        All other tokens are the actual answer text.
+        Stream tokens as they are generated via OpenAI SSE.
+        Each token is yielded immediately for real-time UI rendering.
         """
         context = self._build_context(user_id, message, profile_context)
         messages = self._build_messages(message, context, history)
 
         full_response = ""
-        full_thinking = ""
-        in_thinking = False
 
-        async for token in ollama.chat_stream(messages=messages):
-            if token == THINK_START:
-                in_thinking = True
-                yield THINK_START
-                continue
-            if token == THINK_END:
-                in_thinking = False
-                yield THINK_END
-                continue
-
-            if in_thinking:
-                full_thinking += token
-            else:
-                full_response += token
-
+        async for token in llm.chat_stream(messages=messages):
+            full_response += token
             yield token
 
-        # Store after streaming completes (only the clean answer)
+        # Store after streaming completes
         if full_response:
             interaction = f"Kullanıcı: {message}\n{self.name}: {full_response}"
             self.memory.store(
@@ -234,7 +207,7 @@ class BaseAgent(ABC):
         full_prompt = f"{prompt}\n\nGeçmiş context:\n{mem_text}"
 
         try:
-            response = await ollama.chat(
+            response = await llm.chat(
                 messages=[
                     {"role": "system", "content": self.system_prompt},
                     {"role": "user", "content": full_prompt},
